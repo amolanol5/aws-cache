@@ -4,7 +4,7 @@ variable "project_name" {
 
 variable "config_elasticache" {
   default = {
-    cluster_size = 1
+    cluster_size  = 1
     instance_type = "cache.t3.micro"
   }
 }
