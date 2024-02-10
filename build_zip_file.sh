@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Nombre de tu aplicación 
-APP_NAME="python_code"
+APP_NAME="lambda_function_payload"
 
 # Directorio de trabajo
 APP_DIR="custom_build_zip"
