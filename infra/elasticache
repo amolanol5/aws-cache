@@ -6,7 +6,7 @@ resource "aws_elasticache_cluster" "elasticache_cluster" {
   port               = 6379
   subnet_group_name  = aws_elasticache_subnet_group.this.name
   security_group_ids = [aws_security_group.cache.id]
-  depends_on = [ module.vpc ]
+  depends_on         = [module.vpc]
 }
 
 
@@ -43,15 +43,14 @@ resource "aws_security_group" "cache" {
 }
 
 ## Auth
+resource "aws_elasticache_user" "test" {
+  user_id       = var.credential_elasticache.user_name
+  user_name     = var.credential_elasticache.user_name
+  access_string = var.credential_elasticache.access_string
+  engine        = var.credential_elasticache.engine
 
-# resource "aws_elasticache_user" "test" {
-#   user_id       = "testUserId"
-#   user_name     = "testUserName"
-#   access_string = "on ~* +@all"
-#   engine        = "REDIS"
-
-#   authentication_mode {
-#     type      = "password"
-#     passwords = ["password1", "password2"]
-#   }
-# }
+  authentication_mode {
+    type      = "password"
+    passwords = var.credential_elasticache.passwords
+  }
+}
