@@ -1,15 +1,17 @@
 resource "aws_db_instance" "this" {
-  allocated_storage    = 10
-  db_name              = "dbawscache"
-  engine               = "mysql"
-  engine_version       = "5.7"
-  instance_class       = "db.t3.micro"
-  username             = var.credential_rds_db.username
-  password             = var.credential_rds_db.password
-  parameter_group_name = "default.mysql5.7"
-  skip_final_snapshot  = true
-  db_subnet_group_name = aws_db_subnet_group.this.name
-  depends_on           = [module.vpc]
+  allocated_storage      = 10
+  db_name                = "dbawscache"
+  engine                 = "mysql"
+  engine_version         = "5.7"
+  instance_class         = "db.t3.micro"
+  username               = var.credential_rds_db.username
+  password               = var.credential_rds_db.password
+  parameter_group_name   = "default.mysql5.7"
+  skip_final_snapshot    = true
+  publicly_accessible    = false
+  db_subnet_group_name   = aws_db_subnet_group.this.name
+  vpc_security_group_ids = [aws_security_group.db.id]
+  depends_on             = [module.vpc]
 }
 
 
@@ -27,9 +29,9 @@ resource "aws_security_group" "db" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description = "TLS from VPC"
-    from_port   = 5432
-    to_port     = 5432
+    description = "mysql from VPC"
+    from_port   = 3306
+    to_port     = 3306
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
