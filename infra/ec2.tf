@@ -14,17 +14,20 @@ resource "aws_instance" "this" {
   instance_type                        = "t3.large"
   subnet_id                            = module.vpc.public_subnets[0]
   instance_initiated_shutdown_behavior = "terminate"
+  user_data_replace_on_change          = true
   associate_public_ip_address          = true
   vpc_security_group_ids               = [aws_security_group.instance.id]
 
 
-  user_data = templatefile("${path.module}/scripts/install_db.sh", {
+  user_data = templatefile("${path.module}/scripts/install_db.sh.tpl", {
     DB_HOST     = aws_db_instance.this.address
     DB_ADMIN    = var.credential_rds_db.username
     DB_PASSWORD = var.credential_rds_db.password
-    DB_FILE     = templatefile("${path.module}/scripts/seed.sql", {})
+    DB_FILE     = templatefile("${path.module}/scripts/seed.sql.tpl", {})
 
   })
+
+  depends_on = [aws_db_instance.this]
 
   tags = {
     Name = "build-database"
