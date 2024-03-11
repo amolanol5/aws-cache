@@ -3,12 +3,13 @@ import json
 import redis
 import pymysql
 
+
 ## Handler
 def lambda_handler(event, context):
     message = "The query was {} !".format(event["query"])
     return {"message": message}
-    
-    
+
+
 class DB:
     def __init__(self, **params):
         params.setdefault("charset", "utf8mb4")
@@ -31,13 +32,13 @@ class DB:
 TTL = 10
 
 # Read the Redis credentials from the REDIS_URL environment variable.
-REDIS_URL = os.environ.get('REDIS_URL')
+REDIS_URL = os.environ.get("REDIS_URL")
 
 # Read the DB credentials from the DB_* environment variables.
-DB_HOST = os.environ.get('DB_HOST')
-DB_USER = os.environ.get('DB_USER')
-DB_PASS = os.environ.get('DB_PASS')
-DB_NAME = os.environ.get('DB_NAME')
+DB_HOST = os.environ.get("DB_HOST")
+DB_USER = os.environ.get("DB_USER")
+DB_PASS = os.environ.get("DB_PASS")
+DB_NAME = os.environ.get("DB_NAME")
 
 # Initialize the database
 Database = DB(host=DB_HOST, user=DB_USER, password=DB_PASS, db=DB_NAME)
@@ -49,13 +50,15 @@ Cache = redis.Redis.from_url(REDIS_URL)
 def fetch(sql):
     """Retrieve records from the cache, or else from the database."""
     res = Cache.get(sql)
+    data = {"result": res, "from": "elasticache"}
 
     if res:
-        return json.loads(res)
+        return json.loads(data)
 
     res = Database.query(sql)
+    data = {"result": res, "from": "rds"}
     Cache.setex(sql, TTL, json.dumps(res))
-    return res
+    return data
 
 
 def planet(id):
@@ -76,4 +79,9 @@ def planet(id):
     return res
 
 
+def fetch_from_rds(sql):
+    """Retrieve records from rds."""
 
+    res = Database.query(sql)
+    data = {"result": res, "from": "rds"}
+    return data

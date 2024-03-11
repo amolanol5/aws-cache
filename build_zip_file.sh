@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Nombre de tu aplicación 
-APP_NAME="lambda_function_payload"
+APP_NAME="lambda_function_payload.zip"
 
 # Directorio de trabajo
 APP_DIR="custom_build_zip"
@@ -14,17 +14,6 @@ cp -r src/* "$APP_DIR/"
 pip3 install -r "$APP_DIR/requirements.txt" -t "$APP_DIR/"
 
 # Empaquetar la aplicación en un archivo ZIP
-ZIP_FILE="$APP_NAME.zip"
-zip -r "$ZIP_FILE" $APP_DIR/*
-
-# Actualizar la función Lambda de AWS con el archivo ZIP
-LAMBDA_FUNCTION_NAME="nombre_de_tu_funcion_lambda"
-AWS_REGION="us-east-1"  # Cambia esto al código de tu región
-
-# aws lambda update-function-code --function-name "$LAMBDA_FUNCTION_NAME" --zip-file "fileb://$ZIP_FILE" --region "$AWS_REGION"
-
-# Limpiar el directorio de trabajo temporal
-# rm -rf "$WORK_DIR"
-# echo "Script completado"
-
-rm -rf $APP_DIR
+cd "$APP_DIR"
+zip -r ../$APP_NAME .
+rm -rf ../$APP_DIR
