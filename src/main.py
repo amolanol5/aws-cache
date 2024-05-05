@@ -8,7 +8,8 @@ import datetime
 ## Handler
 def lambda_handler(event, context):
     #query from event
-    query = event["query"]
+    parsed_event = json.loads(event["body"])
+    query = parsed_event["query"]
     print(query)
     
     #data from elasticache or rds
