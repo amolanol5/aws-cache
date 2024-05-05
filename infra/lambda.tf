@@ -71,7 +71,7 @@ resource "aws_lambda_function" "test_lambda" {
       DB_USER = var.credential_rds_db.username
       DB_NAME = var.credential_rds_db.name
       DB_PASS = var.credential_rds_db.password
-      # REDIS_URL = 
+      REDIS_URL = "redis://${aws_elasticache_cluster.elasticache_cluster.cache_nodes[0].address}:6379"
     }
   }
 }

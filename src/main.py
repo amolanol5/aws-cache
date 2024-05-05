@@ -2,14 +2,27 @@ import os
 import json
 import redis
 import pymysql
+import datetime
 
 
 ## Handler
 def lambda_handler(event, context):
-    message = "The query was {} !".format(event["query"])
-    return {"message": message}
+    #query from event
+    query = event["query"]
+    print(query)
+    
+    #data from elasticache or rds
+    fetch_data = fetch(query)
+    print(fetch_data)
+    
+    #add time
+    is_date = datetime.datetime.now()
+    now = is_date.time()
+    res = fetch_data | {"Time": str(now)}
+    
+    return res
 
-
+    
 class DB:
     def __init__(self, **params):
         params.setdefault("charset", "utf8mb4")
@@ -29,7 +42,7 @@ class DB:
 
 
 # Time to live for cached data
-TTL = 10
+TTL = 30
 
 # Read the Redis credentials from the REDIS_URL environment variable.
 REDIS_URL = os.environ.get("REDIS_URL")
@@ -46,42 +59,34 @@ Database = DB(host=DB_HOST, user=DB_USER, password=DB_PASS, db=DB_NAME)
 # Initialize the cache
 Cache = redis.Redis.from_url(REDIS_URL)
 
-
 def fetch(sql):
     """Retrieve records from the cache, or else from the database."""
     res = Cache.get(sql)
-    data = {"result": res, "from": "elasticache"}
 
     if res:
-        return json.loads(data)
+        return {"query_result" : json.loads(res), "A_from" : "Elasticache"} 
 
     res = Database.query(sql)
-    data = {"result": res, "from": "rds"}
+    
+    #saving response in cache
     Cache.setex(sql, TTL, json.dumps(res))
-    return data
+    
+    return {"query_result" : res, "A_from" : "RDS"}
 
 
-def planet(id):
-    """Retrieve a record from the cache, or else from the database."""
-    key = f"planet:{id}"
-    res = Cache.hgetall(key)
+# def planet(id):
+#     """Retrieve a record from the cache, or else from the database."""
+#     key = f"planet:{id}"
+#     res = Cache.hgetall(key)
 
-    if res:
-        return res
+#     if res:
+#         return res
 
-    sql = "SELECT `id`, `name` FROM `planet` WHERE `id`=%s"
-    res = Database.record(sql, (id,))
+#     sql = "SELECT `id`, `name` FROM `planet` WHERE `id`=%s"
+#     res = Database.record(sql, (id,))
 
-    if res:
-        Cache.hmset(key, res)
-        Cache.expire(key, TTL)
+#     if res:
+#         Cache.hmset(key, res)
+#         Cache.expire(key, TTL)
 
-    return res
-
-
-def fetch_from_rds(sql):
-    """Retrieve records from rds."""
-
-    res = Database.query(sql)
-    data = {"result": res, "from": "rds"}
-    return data
+#     return res
