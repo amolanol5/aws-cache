@@ -1,6 +1,7 @@
 import os
 import json
 import redis
+import time
 import pymysql
 import datetime
 
@@ -61,18 +62,23 @@ Database = DB(host=DB_HOST, user=DB_USER, password=DB_PASS, db=DB_NAME)
 Cache = redis.Redis.from_url(REDIS_URL)
 
 def fetch(sql):
+    inicio = time.time()
     """Retrieve records from the cache, or else from the database."""
     res = Cache.get(sql)
 
     if res:
-        return {"query_result" : json.loads(res), "A_from" : "Elasticache"} 
+        fin = time.time()
+        tiempo_total_ms = (fin - inicio) * 1000
+        return {"query_result" : json.loads(res), "A_from" : "Elasticache" , "Tiempo_Ejecucion" : tiempo_total_ms} 
 
     res = Database.query(sql)
+    fin = time.time()
+    tiempo_total_ms = (fin - inicio) * 1000
     
     #saving response in cache
     Cache.setex(sql, TTL, json.dumps(res))
     
-    return {"query_result" : res, "A_from" : "RDS"}
+    return {"query_result" : res, "A_from" : "RDS", "Tiempo_Ejecucion" : tiempo_total_ms}
 
 
 # def planet(id):
