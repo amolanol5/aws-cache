@@ -25,24 +25,24 @@ resource "aws_iam_role_policy" "policy_lamda" {
     Statement = [
       {
         Action = [
-            "ec2:CreateNetworkInterface",
-            "ec2:DescribeNetworkInterfaces",
-            "ec2:DeleteNetworkInterface"
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface"
         ]
         Effect   = "Allow"
         Resource = "*"
       },
-            {
+      {
         Action = [
-            "logs:CreateLogGroup"
+          "logs:CreateLogGroup"
         ]
         Effect   = "Allow"
         Resource = "*"
       },
-            {
+      {
         Action = [
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
         ]
         Effect   = "Allow"
         Resource = "*"
