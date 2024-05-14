@@ -13,11 +13,11 @@
 ```
 - Cuando se realice el  primer Get de la información requerida, se realiza un llamado a RDS y allí se consultan los datos, adicional se realiza un SET de los datos en  REDIS y se establece la cache de 30 segundos.
 
-![alt text](image.png)
+![alt text](image1.jpg)
 
 
 - En el segundo GET se puede observar como quien devuelve los datos es la base de datos de REDIS. de una manera mas rapida.
 
-![alt text](image-1.png)
+![alt text](image2.jpg)
 
 - Cuando finalice el tiempo del TTL , neuvamente se consultaran los datos en RDS
